@@ -44,4 +44,13 @@ export class AvailablePlacesComponent implements OnInit {
       });
     this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
+  onSelectPlace(selectedPlace: Place){
+    // Angular convert automatically to a JSON data.
+    this._httpClient.put('http://localhost:3000/user-places', {
+      placeId: selectedPlace.id,
+    }).subscribe({
+      next: (resData) => console.log(resData),
+      complete: () => {}
+    });
+  }
 }
