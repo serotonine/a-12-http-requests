@@ -67,5 +67,18 @@ export class PlacesService {
       );
   }
 
-  removeUserPlace(place: Place) {}
+  removeUserPlace(place: Place) {
+    const prevPlaces = this._userPlaces();
+    this._userPlaces.set(prevPlaces.filter((item) => item.id !== place.id));
+
+    return this._httpClient
+      .delete(`${REST_BASE_URL}user-places/${place.id}`)
+      .pipe(
+        catchError((error) => {
+          this._userPlaces.set(prevPlaces);
+          this._errorService.showError(error.message);
+          return throwError(() => new Error(error.message));
+        })
+      );
+  }
 }

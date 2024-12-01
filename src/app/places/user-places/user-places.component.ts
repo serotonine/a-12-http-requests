@@ -32,4 +32,12 @@ export class UserPlacesComponent {
     });
     this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
+  onRemovePlace(place: Place) {
+    const subscription = this.placesService.removeUserPlace(place).subscribe({
+      error: (error) => {
+        console.log('addPlaceToUserPlaces', error.message);
+      },
+    });
+    this.destroyRef.onDestroy(() => subscription.unsubscribe());
+  }
 }
