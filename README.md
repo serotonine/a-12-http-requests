@@ -14,4 +14,5 @@ Build [Maximilian Schwarzmüller](https://www.udemy.com/user/maximilian-schwarzm
 - [Angular HttpClient + provideHttpClient](https://www.udemy.com/course/the-complete-guide-to-angular-2/learn/lecture/44116304)
 - [Add HttpClient in NgModule](https://www.udemy.com/course/the-complete-guide-to-angular-2/learn/lecture/44127430)
 - [Move http request logic in a Service](https://www.udemy.com/course/the-complete-guide-to-angular-2/learn/lecture/44116338)
+- [`tap`](https://www.udemy.com/course/the-complete-guide-to-angular-2/learn/lecture/44116340)
 

@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { catchError, map, throwError } from 'rxjs';
+import { catchError, map, tap, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { REST_BASE_URL } from './places.config';
 import { Place } from './place.model';
@@ -10,14 +10,20 @@ import { Place } from './place.model';
 export class PlacesService {
   // Http Client Service injection.
   private _httpClient = inject(HttpClient);
-  private userPlaces = signal<Place[]>([]);
-  loadedUserPlaces = this.userPlaces.asReadonly();
+  private _userPlaces = signal<Place[]>([]);
+  loadedUserPlaces = this._userPlaces.asReadonly();
 
   loadAvailablePlaces() {
     return this.fetchPlaces('places', 'Couille in ze potage!!!');
   }
   loadUserPlaces() {
-    return this.fetchPlaces('user-places', 'Couille in ze potage!!!');
+    return this.fetchPlaces('user-places', 'Couille in ze potage!!!').pipe(tap({
+      next: (userPlaces) => {
+        if(userPlaces){
+          this._userPlaces.set(userPlaces);
+        }
+      },
+    }));
   }
 
   private fetchPlaces(url: string, errorMessage: string) {
