@@ -1,6 +1,6 @@
 import { Component, signal, inject, OnInit, DestroyRef } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { catchError, map, throwError } from 'rxjs';
+// Services.
+import { PlacesService } from '../places.service';
 // Components.
 import { PlacesComponent } from '../places.component';
 import { PlacesContainerComponent } from '../places-container/places-container.component';
@@ -15,42 +15,29 @@ import { type Place } from '../place.model';
   imports: [PlacesComponent, PlacesContainerComponent],
 })
 export class AvailablePlacesComponent implements OnInit {
+  placeService = inject(PlacesService);
   places = signal<Place[] | undefined>(undefined);
   isFetching = signal(false);
   error = signal('');
-  // Http Client Service injection.
-  private _httpClient = inject(HttpClient);
+
   destroyRef = inject(DestroyRef);
   ngOnInit(): void {
     this.isFetching.set(true);
     // Return an Observable.
-    const subscription = this._httpClient
-      .get<{ places: Place[] }>('http://localhost:3000/places', {
-        // Return the entire response datas.
-        observe: 'response',
-      })
-      // Transforms data if needed.
-      .pipe(
-        map((response) => response.body?.places),
-        // Optional.
-        catchError((error) =>
-          throwError(() => new Error('Couille in ze potage'))
-        )
-      )
-      .subscribe({
-        next: (response) => this.places.set(response),
+    const subscription = this.placeService.loadAvailablePlaces().subscribe({
+        next: (places) => this.places.set(places),
         complete: () => this.isFetching.set(false),
         error: (error: Error) => this.error.set(error.message),
       });
     this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
+
   onSelectPlace(selectedPlace: Place){
-    // Angular convert automatically to a JSON data.
-    this._httpClient.put('http://localhost:3000/user-places', {
-      placeId: selectedPlace.id,
-    }).subscribe({
+    console.log(selectedPlace);
+  const subscription = this.placeService.addPlaceToUserPlaces(selectedPlace.id).subscribe({
       next: (resData) => console.log(resData),
       complete: () => {}
     });
+    this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 }
