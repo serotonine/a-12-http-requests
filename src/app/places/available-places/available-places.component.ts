@@ -33,10 +33,8 @@ export class AvailablePlacesComponent implements OnInit {
   }
 
   onSelectPlace(selectedPlace: Place){
-    console.log(selectedPlace);
-  const subscription = this.placeService.addPlaceToUserPlaces(selectedPlace.id).subscribe({
-      next: (resData) => console.log(resData),
-      complete: () => {}
+  const subscription = this.placeService.addPlaceToUserPlaces(selectedPlace).subscribe({
+      error: (error) => {console.log('addPlaceToUserPlaces', error.message)}
     });
     this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }

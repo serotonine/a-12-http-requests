@@ -17,13 +17,15 @@ export class PlacesService {
     return this.fetchPlaces('places', 'Couille in ze potage!!!');
   }
   loadUserPlaces() {
-    return this.fetchPlaces('user-places', 'Couille in ze potage!!!').pipe(tap({
-      next: (userPlaces) => {
-        if(userPlaces){
-          this._userPlaces.set(userPlaces);
-        }
-      },
-    }));
+    return this.fetchPlaces('user-places', 'Couille in ze potage!!!').pipe(
+      tap({
+        next: (userPlaces) => {
+          if (userPlaces) {
+            this._userPlaces.set(userPlaces);
+          }
+        },
+      })
+    );
   }
 
   private fetchPlaces(url: string, errorMessage: string) {
@@ -42,11 +44,24 @@ export class PlacesService {
     );
   }
 
-  addPlaceToUserPlaces(placeId: string) {
+  addPlaceToUserPlaces(place: Place) {
+    const prevPlaces = this._userPlaces();
+    // Avoid dupplicate.
+    if (!prevPlaces.some((item) => item.id === place.id)) {
+      this._userPlaces.set([...prevPlaces, place]);
+    }
     // Angular convert automatically to a JSON data.
-    return this._httpClient.put(`${REST_BASE_URL}user-places`, {
-      placeId,
-    });
+    return this._httpClient
+      .put(`${REST_BASE_URL}user-places`, {
+        placeId: place.id,
+        observe: 'response',
+      })
+      .pipe(
+        catchError((error) => {
+          this._userPlaces.set(prevPlaces);
+          return throwError(() => new Error(error));
+        })
+      );
   }
 
   removeUserPlace(place: Place) {}
